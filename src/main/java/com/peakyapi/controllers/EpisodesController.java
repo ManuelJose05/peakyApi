@@ -6,12 +6,12 @@ import com.peakyapi.models.User;
 import com.peakyapi.services.EpisodeService;
 import com.peakyapi.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.awt.print.Pageable;
+import org.springframework.data.domain.Pageable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -128,15 +128,25 @@ public class EpisodesController {
 
     //TODO
     @GetMapping(value = "/episodes/listPagination")
-    public ResponseEntity<Map<String,Object>> getEpisodesPagination(@RequestParam int pageSize) {
-        response.clear();
+    public ResponseEntity<Map<String,Object>> getEpisodesPagination(@PageableDefault(size=6) Pageable pageable, @RequestParam String token) {
+       response.clear();
 
-        Pageable page = (Pageable) PageRequest.of(0, pageSize);
+       User temp = userService.findUserByToken(token);
+       if (temp == null) return new GlobalExceptionHandler().customException("Unauthorized","Invalid token",HttpStatus.UNAUTHORIZED);
 
-        ArrayList<Episode> episodes = episodeService.getEpisodesPagination(page);
+       Page<Episode> episodios = episodeService.getEpisodesPagination(pageable);
 
-        response.put("episodes",episodes);
-        response.put("total_episodes",episodes.size());
-        return new ResponseEntity<>(response,HttpStatus.OK);
+       if (episodios.isEmpty()) return new GlobalExceptionHandler().customException("Not found","Server cannot find episodes",HttpStatus.NOT_FOUND);
+
+        response.put("episodes", episodios.getContent());
+        response.put("total_episodes", episodios.getTotalElements());
+        response.put("total_pages", episodios.getTotalPages());
+        response.put("current_page", episodios.getNumber());
+        response.put("page_size", episodios.getSize());
+        response.put("has_next", episodios.hasNext());
+        response.put("has_previous", episodios.hasPrevious());
+        response.put("next","http://localhost:8080/api/episodes/listPagination?page=" + (episodios.getNumber() + 1));
+
+       return new ResponseEntity<>(response,HttpStatus.OK);
     }
 }

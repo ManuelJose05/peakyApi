@@ -3,11 +3,15 @@ package com.peakyapi.repositories;
 import com.peakyapi.models.Episode;
 import com.peakyapi.models.User;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 
-import java.awt.print.Pageable;
 
-public interface EpisodesRespository extends JpaRepository<Episode, Integer> {
+public interface EpisodesRespository extends JpaRepository<Episode, Integer>, PagingAndSortingRepository<Episode, Integer> {
 
   public Episode findByTitle(String title);
 
@@ -23,6 +27,5 @@ public interface EpisodesRespository extends JpaRepository<Episode, Integer> {
     save(episode);
   }
 
-  //TODO
-  public Iterable<Episode> findAll(Pageable pageable);
+   Page<Episode> findAll(final Pageable pageable);
 }

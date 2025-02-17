@@ -5,10 +5,11 @@ import com.peakyapi.repositories.EpisodesRespository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import java.awt.print.Pageable;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,8 +27,8 @@ public class EpisodeService {
     }
 
     //TODO
-    public ArrayList<Episode> getEpisodesPagination(Pageable peable) {
-        return (ArrayList<Episode>) episodesRespository.findAll(peable);
+    public Page<Episode> getEpisodesPagination(Pageable peable) {
+        return episodesRespository.findAll(peable);
     }
 
     public ArrayList<Episode> getEpisodesBySeasonNumber(int seasonNumber) {
