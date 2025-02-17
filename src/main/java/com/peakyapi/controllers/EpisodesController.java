@@ -5,6 +5,8 @@ import com.peakyapi.models.Rol;
 import com.peakyapi.models.User;
 import com.peakyapi.services.EpisodeService;
 import com.peakyapi.services.UserService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.web.PageableDefault;
@@ -28,16 +30,15 @@ public class EpisodesController {
     Map<String,Object> response = new HashMap<>();
 
 
-    //EPISODES
-
+    @ApiOperation(value = "Get episodes with filters", notes = "Returns a list of episodes filtered by optional parameters such as id, season number, episode number, and title.")
     @GetMapping(value = "/episodes")
-    public ResponseEntity<Map<String,Object>> episodes(@RequestParam String token,@RequestParam(required = false) Integer id,
-                                                       @RequestParam(required = false) Integer season_number,
-                                                       @RequestParam(required = false) Integer episode_number,
-                                                       @RequestParam(required = false) String title) {
+    public ResponseEntity<Map<String,Object>> episodes(
+            @ApiParam(value = "User authentication token", required = true) @RequestParam String token,
+            @ApiParam(value = "Episode ID") @RequestParam(required = false) Integer id,
+            @ApiParam(value = "Season number") @RequestParam(required = false) Integer season_number,
+            @ApiParam(value = "Episode number") @RequestParam(required = false) Integer episode_number,
+            @ApiParam(value = "Episode title") @RequestParam(required = false) String title) {
         response.clear();
-
-        System.out.println(season_number);
 
         User temp = userService.findUserByToken(token);
         if (temp == null) return new GlobalExceptionHandler().customException("Unauthorized", "Invalid token", HttpStatus.UNAUTHORIZED);
@@ -46,29 +47,17 @@ public class EpisodesController {
 
         if (episodes == null || episodes.isEmpty()) return new GlobalExceptionHandler().customException("No episodes","episodes not found",HttpStatus.NOT_FOUND);
 
-        response.put("messgae","Successfully retrieved episodes");
+        response.put("message","Successfully retrieved episodes");
         response.put("status",HttpStatus.OK);
         response.put("episodes",episodes);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/episodes/list")
-    public ResponseEntity<Map<String, Object>> listEpisodes(@RequestParam String token) {
-        //Removes all the mappings from response
-        response.clear();
-
-        User temp = userService.findUserByToken(token);
-        if (temp == null) return new GlobalExceptionHandler().customException("Unauthorized","Invalid token", HttpStatus.UNAUTHORIZED);
-
-        ArrayList<Episode> episodes = episodeService.getEpisodes();
-        if (episodes == null) return new GlobalExceptionHandler().customException(null,"No episodes found",HttpStatus.NO_CONTENT);
-        response.put("episodes",episodes);
-        response.put("total_episodes",episodes.size());
-        return new ResponseEntity<>(response,HttpStatus.OK);
-    }
-
+    @ApiOperation(value = "Add a new episode", notes = "Creates a new episode with the provided season number, episode number, title, and description.")
     @PostMapping(value = "/episodes")
-    public ResponseEntity<Map<String,Object>> addEpisode(@RequestBody Map<String,String> body, @RequestParam String token) {
+    public ResponseEntity<Map<String,Object>> addEpisode(
+            @ApiParam(value = "Episode details as a map containing season_number, episode_number, title, and description", required = true) @RequestBody Map<String,String> body,
+            @ApiParam(value = "User authentication token", required = true) @RequestParam String token) {
         response.clear();
 
         User temp = userService.findUserByToken(token);
@@ -89,8 +78,12 @@ public class EpisodesController {
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
+    @ApiOperation(value = "Update an existing episode", notes = "Updates the details of an existing episode, such as season number, episode number, title, and description.")
     @PutMapping(value = "/episodes/update/{id}")
-    public ResponseEntity<Map<String,Object>> updateEpisode(@RequestBody Map<String,Object> body, @PathVariable int id,@RequestParam String token) {
+    public ResponseEntity<Map<String,Object>> updateEpisode(
+            @ApiParam(value = "Episode details as a map containing season_number, episode_number, title, and description", required = true) @RequestBody Map<String,Object> body,
+            @ApiParam(value = "ID of the episode to be updated", required = true) @PathVariable int id,
+            @ApiParam(value = "User authentication token", required = true) @RequestParam String token) {
         response.clear();
 
         User temp = userService.findUserByToken(token);
@@ -111,8 +104,11 @@ public class EpisodesController {
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
+    @ApiOperation(value = "Delete an existing episode", notes = "Deletes a specific episode by its ID. Only admin users are authorized to perform this operation.")
     @DeleteMapping(value = "/episodes/delete/{id}")
-    public ResponseEntity<Map<String,Object>> deleteEpisode(@PathVariable int id, @RequestParam String token) {
+    public ResponseEntity<Map<String,Object>> deleteEpisode(
+            @ApiParam(value = "ID of the episode to be deleted", required = true) @PathVariable int id,
+            @ApiParam(value = "User authentication token", required = true) @RequestParam String token) {
         response.clear();
 
         User temp = userService.findUserByToken(token);
@@ -126,17 +122,19 @@ public class EpisodesController {
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
-    //TODO
+    @ApiOperation(value = "Get episodes with pagination", notes = "Returns a paginated list of episodes with details like total elements, total pages, current page, and navigation information.")
     @GetMapping(value = "/episodes/listPagination")
-    public ResponseEntity<Map<String,Object>> getEpisodesPagination(@PageableDefault(size=6) Pageable pageable, @RequestParam String token) {
-       response.clear();
+    public ResponseEntity<Map<String,Object>> getEpisodesPagination(
+            @ApiParam(value = "Pagination information", required = true) @PageableDefault(size=6) Pageable pageable,
+            @ApiParam(value = "User authentication token", required = true) @RequestParam String token) {
+        response.clear();
 
-       User temp = userService.findUserByToken(token);
-       if (temp == null) return new GlobalExceptionHandler().customException("Unauthorized","Invalid token",HttpStatus.UNAUTHORIZED);
+        User temp = userService.findUserByToken(token);
+        if (temp == null) return new GlobalExceptionHandler().customException("Unauthorized","Invalid token",HttpStatus.UNAUTHORIZED);
 
-       Page<Episode> episodios = episodeService.getEpisodesPagination(pageable);
+        Page<Episode> episodios = episodeService.getEpisodesPagination(pageable);
 
-       if (episodios.isEmpty()) return new GlobalExceptionHandler().customException("Not found","Server cannot find episodes",HttpStatus.NOT_FOUND);
+        if (episodios.isEmpty()) return new GlobalExceptionHandler().customException("Not found","Server cannot find episodes",HttpStatus.NOT_FOUND);
 
         response.put("episodes", episodios.getContent());
         response.put("total_episodes", episodios.getTotalElements());
@@ -147,6 +145,6 @@ public class EpisodesController {
         response.put("has_previous", episodios.hasPrevious());
         response.put("next","http://localhost:8080/api/episodes/listPagination?page=" + (episodios.getNumber() + 1));
 
-       return new ResponseEntity<>(response,HttpStatus.OK);
+        return new ResponseEntity<>(response,HttpStatus.OK);
     }
 }

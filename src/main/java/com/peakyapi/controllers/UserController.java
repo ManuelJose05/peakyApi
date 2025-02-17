@@ -5,6 +5,9 @@ import com.peakyapi.models.User;
 import com.peakyapi.services.UserService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +21,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping
+@Api(value = "User Controller", tags = {"User Management"})
 public class UserController {
     @Autowired
     UserService userService;
@@ -26,10 +30,11 @@ public class UserController {
 
     String privateKey = "9b8e0c3a4d7f6a9832c1d4b5e6a7f8c9a1b2c3d4e5f67890123456789abcdef0";
 
-    //Get method which return a list of all users in BBDD
+    @ApiOperation(value = "List all users", notes = "Returns a list of all users in the database.")
     @GetMapping(value = "/users")
-    public ResponseEntity<Map<String, Object>> listAll(@RequestParam String token) {
-        //Removes all the mappings from response
+    public ResponseEntity<Map<String, Object>> listAll(
+            @ApiParam(value = "Authentication token of the user", required = true, example = "your_token_here")
+            @RequestParam String token) {
         response.clear();
 
         User temp = userService.findUserByToken(token);
@@ -40,48 +45,40 @@ public class UserController {
         ArrayList<String> emails = new ArrayList<>();
         users.forEach(user -> emails.add(user.getEmail()));
 
-        //ADD TO RESPONSE ALL THE USERS EMAILS AND THE TOTAL OF THOSE
         response.put("users",emails);
         response.put("total_users",emails.size());
 
-        //Return the response and the Http Status (OK == 200)
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    //USERS
-
-    //Método Post que crea un usuario en la BBDD y lo devuelve al usuario para que vea que se ha creado correctamente
+    @ApiOperation(value = "Create a new user", notes = "Registers a new user and returns the created user with a token.")
     @PostMapping(value = "/register")
-    public ResponseEntity<Map<String,Object>> createUser(@RequestBody User user) {
-        //Removes all the mappings from response
+    public ResponseEntity<Map<String,Object>> createUser(
+            @ApiParam(value = "User object containing email, password", required = true)
+            @RequestBody User user) {
         response.clear();
 
-        //Instaciamos bcrypt que será un objeto de la clase BcryptPasswordEnconder para hashear las contraseñas
-        //de los usuarios que se vayan creando
         BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
-
-        //Desectructuramos el contenido del cuerpo y guardamos en variables el email / password
-        //La contraseña será hasheada mediante el enconder
 
         if (user == null) return new GlobalExceptionHandler().customException("Unauthorized","Invalid user", HttpStatus.UNAUTHORIZED);
 
-        //Generamos un token con la ayuda de Jwts
         String token = Jwts.builder().setSubject(user.getEmail()).setIssuedAt(new Date())
                 .signWith(SignatureAlgorithm.HS256,privateKey).compact();
 
-        //Creamos un objeto de tipo user, lo subimos a la base de datos mediante el servicio
         User temp = new User(user.getEmail(),bcrypt.encode(user.getPassword()),token,user.getRol());
 
         if (!userService.addUser(temp)) return new GlobalExceptionHandler().customException("User already exists","A user with the given details already exists in the database",HttpStatus.CONFLICT);
         response.put("token", token);
         response.put("status", HttpStatus.CREATED);
 
-        //Retornamos el objeto de tipo User para que el usuario vea que se ha realizado correctamente
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
+    @ApiOperation(value = "Login a user", notes = "Authenticates a user and returns their information along with a token.")
     @PostMapping(value = "/login")
-    public ResponseEntity<Map<String,Object>> lgoin(@RequestBody User user) {
+    public ResponseEntity<Map<String,Object>> lgoin(
+            @ApiParam(value = "User object containing email and password", required = true)
+            @RequestBody User user) {
         response.clear();
         BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
 
@@ -99,5 +96,4 @@ public class UserController {
 
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
-
 }

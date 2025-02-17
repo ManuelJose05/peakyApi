@@ -1,26 +1,34 @@
 package com.peakyapi.models;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "episodes")
+@ApiModel(description = "Model episode which depicts an episode of the series")
 public class Episode {
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @ApiModelProperty(name = "ID", notes = "Unique episode identifier", example = "1", required = true)
     private Integer id;
 
     @Column(name = "season_number", nullable = false)
+    @ApiModelProperty(name = "Season Number", notes = "Season number in which the episode appears", example = "3", required = true)
     private Integer seasonNumber;
 
     @Column(name = "episode_number", nullable = false)
+    @ApiModelProperty(name = "Episode Number", notes = "Episode number within the season", example = "5", required = true)
     private Integer episodeNumber;
 
     @Column(name = "title")
+    @ApiModelProperty(name = "Title", notes = "Episode title", example = "The Redemption", required = false)
     private String title;
 
     @Lob
     @Column(name = "description", nullable = false)
+    @ApiModelProperty(name = "Description", notes = "Detailed character description", example = "En este episodio, Tommy enfrenta sus demonios del pasado.", required = true)
     private String description;
 
     public Episode(Integer id, Integer seasonNumber, Integer episodeNumber, String title, String description) {
