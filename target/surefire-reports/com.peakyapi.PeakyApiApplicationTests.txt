@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.peakyapi.PeakyApiApplicationTests
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.150 s -- in com.peakyapi.PeakyApiApplicationTests
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 8.456 s -- in com.peakyapi.PeakyApiApplicationTests
