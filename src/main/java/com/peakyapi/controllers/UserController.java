@@ -5,9 +5,8 @@ import com.peakyapi.models.User;
 import com.peakyapi.services.UserService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +20,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping
-@Api(value = "User Controller", tags = {"User Management"})
+@Tag(name = "User",description = "User controller")
 public class UserController {
     @Autowired
     UserService userService;
@@ -30,10 +29,9 @@ public class UserController {
 
     String privateKey = "9b8e0c3a4d7f6a9832c1d4b5e6a7f8c9a1b2c3d4e5f67890123456789abcdef0";
 
-    @ApiOperation(value = "List all users", notes = "Returns a list of all users in the database.")
+    @Operation(summary = "List all users", description = "Returns a list of all users in the database")
     @GetMapping(value = "/users")
     public ResponseEntity<Map<String, Object>> listAll(
-            @ApiParam(value = "Authentication token of the user", required = true, example = "your_token_here")
             @RequestParam String token) {
         response.clear();
 
@@ -51,10 +49,9 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @ApiOperation(value = "Create a new user", notes = "Registers a new user and returns the created user with a token.")
+    @Operation(summary = "Create a new user", description = "Registers a new user and returns the created user with a token.")
     @PostMapping(value = "/register")
     public ResponseEntity<Map<String,Object>> createUser(
-            @ApiParam(value = "User object containing email, password", required = true)
             @RequestBody User user) {
         response.clear();
 
@@ -74,10 +71,9 @@ public class UserController {
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
-    @ApiOperation(value = "Login a user", notes = "Authenticates a user and returns their information along with a token.")
+    @Operation(summary = "Login a user", description = "Authenticates a user and returns their information along with a token.")
     @PostMapping(value = "/login")
     public ResponseEntity<Map<String,Object>> lgoin(
-            @ApiParam(value = "User object containing email and password", required = true)
             @RequestBody User user) {
         response.clear();
         BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();

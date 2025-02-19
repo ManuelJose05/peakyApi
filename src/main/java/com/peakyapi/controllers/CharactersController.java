@@ -7,8 +7,8 @@ import com.peakyapi.models.User;
 import com.peakyapi.services.CharacterService;
 import com.peakyapi.services.UserService;
 import com.peakyapi.utils.Utils;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +18,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping //Initial URL { https://localhost:8080/api/characters }
+@Tag(name = "Characters", description = "Characters controller")
 public class CharactersController {
     //Auth Services
     @Autowired
@@ -29,10 +30,10 @@ public class CharactersController {
     //Create a map object which will be the response of HttpRequests
     Map<String,Object> response = new HashMap<>();
 
-    @ApiOperation(value = "Add a new character", notes = "Only admin users can add new characters to the database.")
+    @Operation(summary = "Add a new character", description = "Only admin users can add new characters to the database.")
     @PostMapping(value = "/characters")
     public ResponseEntity<Map<String,Object>> addCharacter(@RequestBody Character character,
-                                                           @ApiParam(value = "The token for user authentication", required = true) @RequestParam String token) {
+                                                           @RequestParam String token) {
         response.clear();
 
         User temp = userService.findUserByToken(token);
@@ -48,11 +49,11 @@ public class CharactersController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @ApiOperation(value = "Update an existing character", notes = "Only admin users can update characters in the database.")
+    @Operation(summary = "Update an existing character", description = "Only admin users can update characters in the database.")
     @PutMapping(value = "/characters/update/{id}")
     public ResponseEntity<Map<String,Object>> updateCharacter(@PathVariable int id,
                                                               @RequestBody Character character,
-                                                              @ApiParam(value = "The token for user authentication", required = true) @RequestParam String token) {
+                                                               @RequestParam String token) {
         response.clear();
 
         User temp = userService.findUserByToken(token);
@@ -69,10 +70,10 @@ public class CharactersController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @ApiOperation(value = "Delete an existing character", notes = "Only admin users can delete characters from the database.")
+    @Operation(summary = "Delete an existing character", description = "Only admin users can delete characters from the database.")
     @DeleteMapping(value = "/characters/delete/{id}")
     public ResponseEntity<Map<String,Object>> deleteCharacter(@PathVariable int id,
-                                                              @ApiParam(value = "The token for user authentication", required = true) @RequestParam String token) {
+                                                              @RequestParam String token) {
         response.clear();
 
         User temp = userService.findUserByToken(token);
@@ -89,13 +90,13 @@ public class CharactersController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @ApiOperation(value = "Get a list of characters", notes = "Retrieve a list of characters filtered by optional parameters such as nationality, birth date, or name.")
+    @Operation(summary = "Get a list of characters", description = "Retrieve a list of characters filtered by optional parameters such as nationality, birth date, or name.")
     @GetMapping(value = "/characters")
-    public ResponseEntity<Map<String, Object>> characters(@RequestParam @ApiParam(value = "The token for user authentication", required = true) String token,
-                                                          @ApiParam(value = "Filter characters by nationality") @RequestParam(required = false) String nationality,
-                                                          @ApiParam(value = "Filter characters by birth date") @RequestParam(required = false) String birthDate,
-                                                          @ApiParam(value = "Filter characters by name") @RequestParam(required = false) String name,
-                                                          @ApiParam(value = "Filter characters by ID") @RequestParam(required = false) Integer id) {
+    public ResponseEntity<Map<String, Object>> characters(@RequestParam String token,
+                                                          @RequestParam(required = false) String nationality,
+                                                          @RequestParam(required = false) String birthDate,
+                                                          @RequestParam(required = false) String name,
+                                                           @RequestParam(required = false) Integer id) {
         response.clear();
 
         if (userService.findUserByToken(token) == null) return new GlobalExceptionHandler().customException("Access denegade", "Invalid token", HttpStatus.UNAUTHORIZED);

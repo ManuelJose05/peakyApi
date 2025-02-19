@@ -1,31 +1,30 @@
 package com.peakyapi.models;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Table(name = "users")
-@ApiModel(description = "User model which represents a user in the system.")
+@Schema(description = "User model which represents a user in the system.")
 public class User {
     @Id
     @Column(name = "email", nullable = false, length = 100)
-    @ApiModelProperty(name = "Email", notes = "User's email address", example = "usuario@example.com", required = true, position = 0)
+    @Schema(name = "Email", description = "User's email address", example = "usuario@example.com", required = true)
     private String email;
 
     @Column(name = "password", nullable = false, length = 100)
-    @ApiModelProperty(name = "Password", notes = "User's password", example = "password123", required = true, position = 1)
+    @Schema(name = "Password", description = "User's password", example = "password123", required = true)
     private String password;
 
     @Lob
     @Column(name = "token", nullable = false)
-    @ApiModelProperty(name = "Token", notes = "User's authentication token", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...", required = true, position = 2)
+    @Schema(name = "Token", description = "User's authentication token", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...", required = true)
     private String token;
 
     @ColumnDefault("'user'")
     @Column(name = "rol", nullable = false, length = 100)
-    @ApiModelProperty(name = "Rol", notes = "User's rol", example = "admin", required = true, position = 3)
+    @Schema(name = "Rol", description = "User's role", example = "admin", required = true)
     private String rol;
 
     public User(String email, String password) {

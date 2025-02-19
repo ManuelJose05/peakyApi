@@ -5,8 +5,8 @@ import com.peakyapi.models.Rol;
 import com.peakyapi.models.User;
 import com.peakyapi.services.EpisodeService;
 import com.peakyapi.services.UserService;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.web.PageableDefault;
@@ -20,6 +20,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping
+@Tag(name = "Episodes",description = "Episodes description")
 public class EpisodesController {
     @Autowired
     EpisodeService episodeService;
@@ -30,14 +31,14 @@ public class EpisodesController {
     Map<String,Object> response = new HashMap<>();
 
 
-    @ApiOperation(value = "Get episodes with filters", notes = "Returns a list of episodes filtered by optional parameters such as id, season number, episode number, and title.")
+    @Operation(summary = "Get episodes with filters", description = "Returns a list of episodes filtered by optional parameters such as id, season number, episode number, and title.")
     @GetMapping(value = "/episodes")
     public ResponseEntity<Map<String,Object>> episodes(
-            @ApiParam(value = "User authentication token", required = true) @RequestParam String token,
-            @ApiParam(value = "Episode ID") @RequestParam(required = false) Integer id,
-            @ApiParam(value = "Season number") @RequestParam(required = false) Integer season_number,
-            @ApiParam(value = "Episode number") @RequestParam(required = false) Integer episode_number,
-            @ApiParam(value = "Episode title") @RequestParam(required = false) String title) {
+             @RequestParam String token,
+             @RequestParam(required = false) Integer id,
+             @RequestParam(required = false) Integer season_number,
+             @RequestParam(required = false) Integer episode_number,
+            @RequestParam(required = false) String title) {
         response.clear();
 
         User temp = userService.findUserByToken(token);
@@ -53,11 +54,11 @@ public class EpisodesController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @ApiOperation(value = "Add a new episode", notes = "Creates a new episode with the provided season number, episode number, title, and description.")
+    @Operation(summary = "Add a new episode", description = "Creates a new episode with the provided season number, episode number, title, and description.")
     @PostMapping(value = "/episodes")
     public ResponseEntity<Map<String,Object>> addEpisode(
-            @ApiParam(value = "Episode details as a map containing season_number, episode_number, title, and description", required = true) @RequestBody Map<String,String> body,
-            @ApiParam(value = "User authentication token", required = true) @RequestParam String token) {
+             @RequestBody Map<String,String> body,
+            @RequestParam String token) {
         response.clear();
 
         User temp = userService.findUserByToken(token);
@@ -78,12 +79,12 @@ public class EpisodesController {
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
-    @ApiOperation(value = "Update an existing episode", notes = "Updates the details of an existing episode, such as season number, episode number, title, and description.")
+    @Operation(summary = "Update an existing episode", description = "Updates the details of an existing episode, such as season number, episode number, title, and description.")
     @PutMapping(value = "/episodes/update/{id}")
     public ResponseEntity<Map<String,Object>> updateEpisode(
-            @ApiParam(value = "Episode details as a map containing season_number, episode_number, title, and description", required = true) @RequestBody Map<String,Object> body,
-            @ApiParam(value = "ID of the episode to be updated", required = true) @PathVariable int id,
-            @ApiParam(value = "User authentication token", required = true) @RequestParam String token) {
+             @RequestBody Map<String,Object> body,
+             @PathVariable int id,
+            @RequestParam String token) {
         response.clear();
 
         User temp = userService.findUserByToken(token);
@@ -104,11 +105,11 @@ public class EpisodesController {
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
-    @ApiOperation(value = "Delete an existing episode", notes = "Deletes a specific episode by its ID. Only admin users are authorized to perform this operation.")
+    @Operation(summary = "Delete an existing episode", description = "Deletes a specific episode by its ID. Only admin users are authorized to perform this operation.")
     @DeleteMapping(value = "/episodes/delete/{id}")
     public ResponseEntity<Map<String,Object>> deleteEpisode(
-            @ApiParam(value = "ID of the episode to be deleted", required = true) @PathVariable int id,
-            @ApiParam(value = "User authentication token", required = true) @RequestParam String token) {
+             @PathVariable int id,
+            @RequestParam String token) {
         response.clear();
 
         User temp = userService.findUserByToken(token);
@@ -122,11 +123,11 @@ public class EpisodesController {
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
-    @ApiOperation(value = "Get episodes with pagination", notes = "Returns a paginated list of episodes with details like total elements, total pages, current page, and navigation information.")
+    @Operation(summary = "Get episodes with pagination", description = "Returns a paginated list of episodes with details like total elements, total pages, current page, and navigation information.")
     @GetMapping(value = "/episodes/listPagination")
     public ResponseEntity<Map<String,Object>> getEpisodesPagination(
-            @ApiParam(value = "Pagination information", required = true) @PageableDefault(size=6) Pageable pageable,
-            @ApiParam(value = "User authentication token", required = true) @RequestParam String token) {
+            @PageableDefault(size=6) Pageable pageable,
+            @RequestParam String token) {
         response.clear();
 
         User temp = userService.findUserByToken(token);
