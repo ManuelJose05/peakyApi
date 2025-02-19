@@ -37,7 +37,6 @@ public class CharactersController {
         response.clear();
 
         User temp = userService.findUserByToken(token);
-        if (!Utils.tokenValidate(token, temp)) return new GlobalExceptionHandler().customException("Access denegade", "Invalid token", HttpStatus.UNAUTHORIZED);
         if (temp.getRol().equals(Rol.USER)) return new GlobalExceptionHandler().customException("Access denegade", "Only admin users can modify BD info", HttpStatus.UNAUTHORIZED);
 
         if (character.getName().isEmpty() || character.getActor().isEmpty()) return new GlobalExceptionHandler().customException("Bad request", "Name and actor are required", HttpStatus.BAD_REQUEST);
@@ -57,7 +56,6 @@ public class CharactersController {
         response.clear();
 
         User temp = userService.findUserByToken(token);
-        if (!Utils.tokenValidate(token, temp)) return new GlobalExceptionHandler().customException("Access denegade", "Invalid token", HttpStatus.UNAUTHORIZED);
         if (temp.getRol().equals(Rol.USER)) return new GlobalExceptionHandler().customException("Access denegade", "Only admin users can modify BD info", HttpStatus.UNAUTHORIZED);
 
         if (characterService.getCharacterById(id) == null) return new GlobalExceptionHandler().customException("ID error", "Character not found", HttpStatus.NOT_FOUND);

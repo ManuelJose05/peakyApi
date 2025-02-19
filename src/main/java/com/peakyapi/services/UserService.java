@@ -25,4 +25,12 @@ public class UserService {
     public User findUserByToken(String token) {
         return userRepository.findByToken(token);
     }
+
+    public boolean updateUser(User user) {
+        return userRepository.saveUser(user);
+    }
+
+    public boolean deleteUser(String email) {
+        return userRepository.deleteUserByEmail(email) != null;
+    }
 }
