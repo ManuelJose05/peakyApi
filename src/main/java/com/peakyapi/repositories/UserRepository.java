@@ -17,7 +17,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Transactional
     default boolean saveUser(User user) {
-        if (findByEmail(user.getEmail()) == null) return false;
+        if (findByEmail(user.getEmail()) != null) return false;
         save(user);
         return true;
     }

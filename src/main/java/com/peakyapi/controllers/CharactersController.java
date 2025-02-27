@@ -108,4 +108,23 @@ public class CharactersController {
         response.put("characters", personajes);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @Operation(summary = "Get a list of characters by their name",description = "Get",method = "GET")
+    @GetMapping(value = "/characters/find")
+    public ResponseEntity<Map<String,Object>> getCharactersByQuery(@RequestParam String token,@RequestParam String query) {
+        response.clear();
+
+        if (query.isEmpty() || query.isBlank()) return new GlobalExceptionHandler().customException("Bad request", "Query is required", HttpStatus.BAD_REQUEST);
+
+        if (userService.findUserByToken(token) == null) return new GlobalExceptionHandler().customException("Access denegade", "Invalid token", HttpStatus.UNAUTHORIZED);
+
+        ArrayList<Character> temp = characterService.getCharactersByQuery(query);
+
+        if (temp.isEmpty()) return new GlobalExceptionHandler().customException("No characters found", "Characters not found", HttpStatus.NOT_FOUND);
+
+        response.put("status", HttpStatus.OK);
+        response.put("message", "Successfully retrieved characters");
+        response.put("characters", temp);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

@@ -78,4 +78,11 @@ public class CharacterService {
         return (ArrayList<Character>) query.getResultList();
     }
 
+    public ArrayList<Character> getCharactersByQuery(String query) {
+        StringBuilder queryBuilder = new StringBuilder("SELECT c FROM Character c where LOWER(c.name) like LOWER('%"+query+"%')");
+        TypedQuery<Character> query1 = entityManager.createQuery(queryBuilder.toString(), Character.class);
+
+        return (ArrayList<Character>) query1.getResultList();
+    }
+
 }

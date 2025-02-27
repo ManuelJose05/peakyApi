@@ -12,10 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import java.util.Date;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -86,10 +86,11 @@ public class UserController {
         if (!bcrypt.matches(user.getPassword(),bdUser.getPassword())) return new GlobalExceptionHandler().customException("Unauthorized","Invalid password",HttpStatus.UNAUTHORIZED);
 
         user.setToken(bdUser.getToken());
+        user.setRol(bdUser.getRol());
 
         response.put("status", HttpStatus.ACCEPTED);
         response.put("message", "Successfully login. Welcome friend!!");
-        response.put("user",user);
+        response.put("user",bdUser);
 
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
